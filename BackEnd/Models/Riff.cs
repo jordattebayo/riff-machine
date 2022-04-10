@@ -4,16 +4,11 @@
 
     public class Riff
     {
-        [JsonProperty(PropertyName = "id")]
-        public long Id { get; set; }
+        public Guid id { get; set; }
+        public string riff { get; set; }
+        public DateTime dateCreated { get; set; }
+        public string? author { get; set; }
+        public string? documentType {  get; set; }
 
-        [JsonProperty(PropertyName = "name")]
-        public string? Name { get; set; }
-
-        [JsonProperty(PropertyName = "dateCreated")]
-        public DateTime DateCreated { get; set; }
-
-        [JsonProperty(PropertyName = "author")]
-        public string? Author { get; set; }
     }
 }
