@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.Cosmos;
+using riffmachine.DataAccess;
 using riffmachine.Models;
 
 // To do: extract CosmosClient to be a singleton method, only establish one connection. 
@@ -13,47 +14,62 @@ namespace riffmachine.Controllers
     {
         private readonly IConfiguration _configuration;
         private readonly ILogger _logger;
-        public RiffController(IConfiguration configuration, ILogger<Riff> logger)
+        private readonly CosmosClient _cosmosClient;
+        public RiffController(IConfiguration configuration, ILogger<Riff> logger, CosmosClient cosmosClient)
         {
             _configuration = configuration;
             _logger = logger;
+            _cosmosClient = cosmosClient;
         }
 
         [HttpGet(Name = "GetAllRiffs")]
-        public ActionResult<Riff> GetAllRiffs()
+        public ActionResult<List<Riff>> GetAllRiffs()
         {
             string EndpointUrl = _configuration["CosmosDb:Uri"].ToString();
-            var CosmosDatabase = _configuration["FHIRConfig:DBName"].ToString();
+            var CosmosDatabase = _configuration["CosmosDb:DBName"].ToString();
             string PrimaryKey = _configuration["CosmosDb:PrimaryKey"].ToString();
             try
             {
-                using (CosmosClient _client = new CosmosClient(EndpointUrl))
+                using (CosmosClient _client = new CosmosClient(EndpointUrl, PrimaryKey))    
                 {
                     Database database = _client.GetDatabase(CosmosDatabase);
                     Container container = database.GetContainer("RiffList");
-                    container.GetItemLinqQueryable<Riff>(true)
+                    List<Riff> riffs = container.GetItemLinqQueryable<Riff>(true)
                         .Where(doc => doc.documentType == "riff").ToList();
-                    return Ok();
+                    return Ok(riffs);
                 }
+
             }
             catch (Exception ex)
             {
                 _logger.LogInformation(ex.Message);
-                return BadRequest();
+                return BadRequest(ex.Message);
             }
         }
 
-        //[HttpGet("{id}")]
-        //public ActionResult<Riff> GetTodoItem(long id)
-        //{
-        //    var todoItem = _dataAccessProvider.GetSingleTodoItem(id);
-        //    if (todoItem == null)
-        //    {
-        //        return NotFound();
-        //    }
+        [HttpGet("{id}")]
+        public async Task<ActionResult<Riff>> GetRiffAsync(string id)
+        {
+            string EndpointUrl = _configuration["CosmosDb:Uri"].ToString();
+            var CosmosDatabase = _configuration["CosmosDb:DBName"].ToString();
+            string PrimaryKey = _configuration["CosmosDb:PrimaryKey"].ToString();
+            try
+            {
+                using (CosmosClient _client = new CosmosClient(EndpointUrl, PrimaryKey))
+                {
+                    Database database = _client.GetDatabase(CosmosDatabase);
+                    Container container = database.GetContainer("RiffList");
+                    var response = await container.ReadItemAsync<Riff>(id, new PartitionKey(id));
+                    return Ok(response.Resource);
+                }
 
-        //    return todoItem;
-        //}
+            }
+            catch (Exception ex)
+            {
+                _logger.LogInformation(ex.Message);
+                return BadRequest(ex.Message);
+            }
+        }
 
         [HttpPost(Name = "PostRiff")]
         public async Task<ActionResult> PostRiff([FromBody] Riff riff)
