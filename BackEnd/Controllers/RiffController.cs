@@ -14,12 +14,10 @@ namespace riffmachine.Controllers
     {
         private readonly IConfiguration _configuration;
         private readonly ILogger _logger;
-        private readonly CosmosClient _cosmosClient;
-        public RiffController(IConfiguration configuration, ILogger<Riff> logger, CosmosClient cosmosClient)
+        public RiffController(IConfiguration configuration, ILogger<Riff> logger)
         {
             _configuration = configuration;
             _logger = logger;
-            _cosmosClient = cosmosClient;
         }
 
         [HttpGet(Name = "GetAllRiffs")]
@@ -93,6 +91,56 @@ namespace riffmachine.Controllers
                     }
                     ItemResponse<Riff> results = await container.CreateItemAsync(riff, new PartitionKey(riff.id.ToString()));
                     return Created(CosmosDatabase, results.Resource);
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogInformation(ex.Message);
+                return BadRequest(ex.Message);
+            }
+        }
+
+        [HttpPut("{id}")]
+        public async Task<ActionResult> UpdateRiff([FromBody] Riff riff, string id)
+        {
+            string EndpointUrl = _configuration["CosmosDb:Uri"].ToString();
+            var CosmosDatabase = _configuration["CosmosDb:DBName"].ToString();
+            string PrimaryKey = _configuration["CosmosDb:PrimaryKey"].ToString();
+
+            try
+            {
+                using (CosmosClient _client = new CosmosClient(EndpointUrl, PrimaryKey))
+                {
+                    Database database = _client.GetDatabase(CosmosDatabase);
+                    Container container = database.GetContainer("RiffList");
+
+                    await container.UpsertItemAsync<Riff>(riff, new PartitionKey(id));
+                    return NoContent();
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogInformation(ex.Message);
+                return BadRequest(ex.Message);
+            }
+        }
+
+        [HttpDelete("{id}")]
+        public async Task<ActionResult> DeleteRiff(string id)
+        {
+            string EndpointUrl = _configuration["CosmosDb:Uri"].ToString();
+            var CosmosDatabase = _configuration["CosmosDb:DBName"].ToString();
+            string PrimaryKey = _configuration["CosmosDb:PrimaryKey"].ToString();
+
+            try 
+            {
+                using (CosmosClient _client = new CosmosClient(EndpointUrl, PrimaryKey))
+                {
+                    Database database = _client.GetDatabase(CosmosDatabase);
+                    Container container = database.GetContainer("RiffList");
+
+                    await container.DeleteItemAsync<Riff>(id, new PartitionKey(id));
+                    return NoContent();
                 }
             }
             catch (Exception ex)

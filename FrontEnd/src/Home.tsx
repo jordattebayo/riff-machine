@@ -8,26 +8,9 @@ import {
 } from 'react-query'
 import { TodoItem } from "./types";
 import { getTodos, postTodo } from './api'
-import { Outlet } from 'react-router-dom';
+import { resolveProjectReferencePath } from 'typescript';
 
-const AppWrapper = styled.div`
-  padding: 4em;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  text-align: center;
-`
-const BodyWrapper = styled.div`
-  width: 100%;
-  min-height: 100vh;
-  margin: 0;
-  padding: 0;
-`
-const TodoList = styled.ul`
-  list-style: none;
-`
-
-export const Layout: React.FC = ({children}) => {
+export const Home: React.FC = () => {
     const queryClient = useQueryClient()
 
     const [inputValue, setInputValue] = useState('');
@@ -51,12 +34,9 @@ export const Layout: React.FC = ({children}) => {
     if (error) return <p>An error has occurred: {error}</p>
   
     return (
-    <BodyWrapper>
-      <AppWrapper>
-        <div>
-          <h2>Riff machine</h2>
-        </div>
-        <Outlet />
-      </AppWrapper>
-  </BodyWrapper>)
+        <>
+      <div>
+        <h2>Test</h2>
+      </div>
+      </>)
   }

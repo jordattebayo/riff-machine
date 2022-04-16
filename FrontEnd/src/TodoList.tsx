@@ -8,26 +8,12 @@ import {
 } from 'react-query'
 import { TodoItem } from "./types";
 import { getTodos, postTodo } from './api'
-import { Outlet } from 'react-router-dom';
 
-const AppWrapper = styled.div`
-  padding: 4em;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  text-align: center;
-`
-const BodyWrapper = styled.div`
-  width: 100%;
-  min-height: 100vh;
-  margin: 0;
-  padding: 0;
-`
 const TodoList = styled.ul`
   list-style: none;
 `
 
-export const Layout: React.FC = ({children}) => {
+export const TodoListApp: React.FC = () => {
     const queryClient = useQueryClient()
 
     const [inputValue, setInputValue] = useState('');
@@ -51,12 +37,36 @@ export const Layout: React.FC = ({children}) => {
     if (error) return <p>An error has occurred: {error}</p>
   
     return (
-    <BodyWrapper>
-      <AppWrapper>
-        <div>
-          <h2>Riff machine</h2>
-        </div>
-        <Outlet />
-      </AppWrapper>
-  </BodyWrapper>)
+        <>
+      <div>
+        <form onSubmit={e => {
+            e.preventDefault();
+            mutation.mutate()
+            setInputValue("");
+            setStatusValue("");
+          }}>
+          <input type="text" value={inputValue} onChange={(event) => setInputValue(event.target.value)} placeholder="List your to-do here"/>
+          <input type="text" value={statusValue} onChange={(event) => setStatusValue(event.target.value)} placeholder="Status"/>
+          <button type='submit'>Add</button>
+        </form>
+      </div>
+      <div>
+      {
+        mutation.isLoading ? <p>Adding todo...</p> : null
+      }
+      {
+        mutation.isError ? (<p>Sorry, an error has occured</p>) : null
+      }
+      </div>
+      <div>
+        <TodoList role="list">
+        {data ?
+          data.map(item => (
+             <Todo todo={item} key={item.id} />
+            )) 
+            : isFetching ? <li><p>Updating...</p></li> : <li><p>nothing loaded?</p></li>
+        }
+        </TodoList>
+      </div>
+      </>)
   }
