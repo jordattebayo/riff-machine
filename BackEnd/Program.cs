@@ -15,23 +15,24 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy(name: "*",
-                      builder =>
-                      {
-                          builder.WithOrigins("http://localhost:3000").AllowAnyHeader().AllowAnyMethod();
-                      });
+    // Removing allow CORS for prod
+    //options.AddPolicy(name: "*",
+    //                  builder =>
+    //                  {
+    //                      builder.WithOrigins("http://localhost:3000").AllowAnyHeader().AllowAnyMethod();
+    //                  });
 });
 
 builder.Services.AddControllers();
 builder.Services.AddDbContext<PostgreSqlContext>(options => options.UseNpgsql(builder.Configuration.GetConnectionString("PostgreSqlDatabase")));
 
+// Some extra stuff just in case I need a jump off point
 //builder.Services.AddCosmos<CosmosDBContext>(options => options.)
 //builder.Services.AddSingleton
+
 builder.Services.AddScoped<IDataAccessProvider, DataAccessProvider>();
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-//builder.Services.AddSingleton<CosmosClient>(c =>);
 builder.Logging.ClearProviders();
 builder.Logging.AddConsole();
 var app = builder.Build();
@@ -42,8 +43,6 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
-
-app.UseCors("*");
 
 app.UseHttpsRedirection();
 
