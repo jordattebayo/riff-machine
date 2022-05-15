@@ -9,6 +9,8 @@ import { getRiffs, postRiff } from './api';
 import { Riff } from './types';
 import RiffItem from './Riff';
 
+//#region Styled Components
+
 const Wrapper = styled.div`
 `
 
@@ -21,8 +23,15 @@ const RiffWrapper = styled.div`
 const RiffContainer = styled.ul`
   width: 700px;
 `
+ //#endregion
 
-export const Home: React.FC<{ setModal: any, riffSelected: any, setRiffSelected: any }> = ({ setModal,  setRiffSelected }) => {
+interface HomeProps {
+  setModal: any, 
+  riffSelected: any, 
+  setRiffSelected: any 
+}
+
+ export const Home: React.FC<HomeProps> = ({ setModal,  setRiffSelected }) => {
     const queryClient = useQueryClient()
 
     const [riffValue, setRiffValue] = useState('');

@@ -3,6 +3,7 @@ import { Riff } from "./types";
 import styled from 'styled-components';
 import { deleteRiff, getRiffs } from './api'
 
+//#region Styled Components
 
 const Wrapper = styled.li`
     display: flexbox;
@@ -33,8 +34,15 @@ const Wrapper = styled.li`
     cursor: pointer;
   }
 `
- 
-const RiffItem: React.FC<{riff: Riff, setModal?: any, setRiffSelected?: any }> = ({ riff, setModal, setRiffSelected }) => {
+ //#endregion
+
+ interface RiffItemProps {
+  riff: Riff, 
+  setModal?: any, 
+  setRiffSelected?: any
+ }
+
+ const RiffItem: React.FC<RiffItemProps> = ({ riff, setModal, setRiffSelected }) => {
 
     const deleteRiff = () => {
       setRiffSelected(riff);

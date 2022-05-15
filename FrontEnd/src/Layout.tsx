@@ -54,12 +54,14 @@ import Modal from './Modal';
   `
 //#endregion
 
-export const Layout: React.FC<{ 
+interface LayoutProps {
   showModal: boolean, 
   setShowModal: any, 
   riffSelected: any,  
   setRiffSelected: any
-    }> = ({ children, showModal, setShowModal, riffSelected, setRiffSelected}) => {
+}
+
+export const Layout: React.FC<LayoutProps> = ({ showModal, setShowModal, riffSelected, setRiffSelected }) => {
 
   const [isLocal, setIsLocal] = useState(false);
 
@@ -92,6 +94,10 @@ export const Layout: React.FC<{
         </Header>
         <Outlet />
       </AppWrapper>
-      { showModal ? <Modal showModal={setShowModal} riffSelected={riffSelected} setRiffSelected={setRiffSelected} /> : null }
+      { showModal ? 
+        <Modal 
+          showModal={setShowModal} 
+          riffSelected={riffSelected} 
+          setRiffSelected={setRiffSelected} /> : null }
   </BodyWrapper>)
   }

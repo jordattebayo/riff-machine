@@ -1,8 +1,8 @@
 import { TodoItem, Riff } from "./types";
 
-const url = 'https://localhost:7290/api'
+//const url = 'https://localhost:7290/api'
 
-//const url = 'https://riffapi.azurewebsites.net/api'
+const url = 'https://riffapi.azurewebsites.net/api'
 
 
 //#region Todo Api
