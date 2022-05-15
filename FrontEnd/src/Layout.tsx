@@ -1,13 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
-import Todo from './Todo';
-import {
-  useQuery,
-  useMutation,
-  useQueryClient,
-} from 'react-query'
-import { TodoItem } from "./types";
-import { getTodos, postTodo } from './api'
 import { Outlet, Link } from 'react-router-dom';
 import Modal from './Modal';
 
@@ -19,6 +11,7 @@ import Modal from './Modal';
     justify-content: center;
     text-align: center;
     width: 100%
+    background: lightblue url("https://i.ytimg.com/vi/ISXnJrITwUw/maxresdefault.jpg") no-repeat fixed center;
   `
 
   const Header = styled.header`
@@ -58,32 +51,47 @@ import Modal from './Modal';
     display: flex;
     justify-content: center;
     align-items: flex-start;
-
   `
 //#endregion
 
-export const Layout: React.FC = ({children}) => {
+export const Layout: React.FC<{ 
+  showModal: boolean, 
+  setShowModal: any, 
+  riffSelected: any,  
+  setRiffSelected: any
+    }> = ({ children, showModal, setShowModal, riffSelected, setRiffSelected}) => {
 
-  const [showModal, setShowModal] = useState(false);
+  const [isLocal, setIsLocal] = useState(false);
+
+  useEffect(() => {
+    if(window){
+      if(window.location.hostname == "localhost"){
+        setIsLocal(true);
+        console.log("running on localhost")
+      }
+    }
+  },[isLocal])
 
   return (
     <BodyWrapper>
       <AppWrapper>
         <Header>
           <h2>Riff machine</h2>
-          <NavContainer>    
-            <NavList>
-              <NavListFirstItem>
-                <Link to="/">Riff App</Link>
-              </NavListFirstItem>
-              <NavListItem>
-                <Link to="/todo">Todo List App</Link>
-              </NavListItem>
-            </NavList>
-          </NavContainer>
+          {isLocal ? 
+            <NavContainer>  
+              <NavList>
+                <NavListFirstItem>
+                  <Link to="/">Riff App</Link>
+                </NavListFirstItem> 
+                <NavListItem>
+                  <Link to="/todo">Todo List App</Link> 
+                </NavListItem>
+              </NavList>
+            </NavContainer>
+          : null}
         </Header>
-        {/* { showModal ? <Modal show={showModal} riff={riff}/> : null } */}
         <Outlet />
       </AppWrapper>
+      { showModal ? <Modal showModal={setShowModal} riffSelected={riffSelected} setRiffSelected={setRiffSelected} /> : null }
   </BodyWrapper>)
   }

@@ -15,15 +15,15 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 
 // Removing allow CORS for prod
-//builder.Services.AddCors(options =>
-//{
-//    
-//    options.AddPolicy(name: "*",
-//                      builder =>
-//                      {
-//                          builder.WithOrigins("http://localhost:3000").AllowAnyHeader().AllowAnyMethod();
-//                      });
-//});
+builder.Services.AddCors(options =>
+{
+
+    options.AddPolicy(name: "*",
+                      builder =>
+                      {
+                          builder.WithOrigins("http://localhost:3000").AllowAnyHeader().AllowAnyMethod();
+                      });
+});
 
 builder.Services.AddControllers();
 builder.Services.AddDbContext<PostgreSqlContext>(options => options.UseNpgsql(builder.Configuration.GetConnectionString("PostgreSqlDatabase")));
@@ -44,6 +44,7 @@ if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
+    app.UseCors("*");
 }
 
 app.UseHttpsRedirection();

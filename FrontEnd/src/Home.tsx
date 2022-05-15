@@ -9,6 +9,9 @@ import { getRiffs, postRiff } from './api';
 import { Riff } from './types';
 import RiffItem from './Riff';
 
+const Wrapper = styled.div`
+`
+
 const RiffWrapper = styled.div`
   width: 100%;
   display: flex;
@@ -19,7 +22,7 @@ const RiffContainer = styled.ul`
   width: 700px;
 `
 
-export const Home: React.FC = () => {
+export const Home: React.FC<{ setModal: any, riffSelected: any, setRiffSelected: any }> = ({ setModal,  setRiffSelected }) => {
     const queryClient = useQueryClient()
 
     const [riffValue, setRiffValue] = useState('');
@@ -40,8 +43,7 @@ export const Home: React.FC = () => {
       }, {
         onSuccess: () => queryClient.invalidateQueries('riffs'),
         onSettled: () => queryClient.refetchQueries(['riffs']),
-    })
-  
+    })  
   
     if (isLoading) return <p>Loading...</p>;
   
@@ -49,7 +51,7 @@ export const Home: React.FC = () => {
   
     return (
         <>
-      <div>
+      <Wrapper>
         <form onSubmit={e => {
             e.preventDefault();
             mutation.mutate()
@@ -66,12 +68,12 @@ export const Home: React.FC = () => {
           <RiffContainer>
             {data ?
             data.map(riff => (
-              <RiffItem riff={riff} key={riff.id} />
+              <RiffItem riff={riff} setModal={setModal} setRiffSelected={setRiffSelected} key={riff.id} />
               )) 
               : isFetching ? <li><p>Updating...</p></li> : <li><p>nothing loaded?</p></li>
           }
           </RiffContainer>
         </RiffWrapper>
-      </div>
+      </Wrapper>
       </>)
   }

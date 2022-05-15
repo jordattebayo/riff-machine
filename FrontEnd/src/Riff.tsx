@@ -34,29 +34,20 @@ const Wrapper = styled.li`
   }
 `
  
-const RiffItem: React.FC<{riff: Riff}> = ({ riff }) => {
-    const queryClient = useQueryClient()
+const RiffItem: React.FC<{riff: Riff, setModal?: any, setRiffSelected?: any }> = ({ riff, setModal, setRiffSelected }) => {
 
-    const deleteTodoMutation = useMutation((riff: Riff) => {
-        const { id } = riff;
-        let stringId = id ? id?.toString() : "";
-        return deleteRiff(stringId);
-      }, {
-        onSuccess: () => queryClient.invalidateQueries('riff'),
-        onSettled: () => queryClient.refetchQueries(['riff']),
-      })
-
-    const showModal = () => {
-
+    const deleteRiff = () => {
+      setRiffSelected(riff);
+      setModal(true);
     }
     
     return (
         <Wrapper>
             <HiddenItem>{riff.id}</HiddenItem>
             <Item>{riff.riff}</Item>
-            <Item>{riff.author}</Item>
+            { !!setModal ? <Item>{riff.author}</Item> : null }
             <HiddenItem>{riff.dateCreated}</HiddenItem>
-            <Delete type='button' onClick={() => deleteTodoMutation.mutate(riff)}>x</Delete>
+            { !!setModal ? <Delete type='button' onClick={() => deleteRiff()}>x</Delete> : null }
         </Wrapper>
         )
 }

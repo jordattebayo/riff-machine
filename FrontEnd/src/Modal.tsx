@@ -9,56 +9,91 @@ const Background = styled.div`
     height: 100%;
     background: white;
     position: fixed;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
 `
 
 const Wrapper = styled.div`
     width: 500px;
-    height: 500px;
+    height: 250px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid black;
 `
  const Item = styled.p`
     padding: 0 2em;
     margin-bottom: 1em;
  `
 
- const HiddenItem = styled.p`
-  padding: 0 2em;
-  margin-bottom: 1em;
-  border: 1px solid black;
-  display: none;
-`
+ const ChoiceContainer = styled.div`
+  display: flex;
+  flex-direction: row;
+ `
 
  const Delete = styled.button`
-  padding-left: 2em;
+  min-height: 25px;
+  min-width: 35px;
+  padding: 0 2em;
   color: red;
   background: none;
-  border: none;
+  border: 1px solid red;
   &:hover {
     cursor: pointer;
   }
 `
+
+const Cancel = styled.button`
+min-height: 25px;
+min-width: 35px;
+margin-left: 1em;
+padding: 0 2em;
+background: none;
+
+border: 1px solid black;
+&:hover {
+  cursor: pointer;
+}
+`
  
-const Modal: React.FC<{show: boolean, riff: Riff}> = ({ show, riff }) => {
+const Modal: React.FC<{ 
+  showModal: any   
+  riffSelected: any,  
+  setRiffSelected: any }> = ({ showModal, riffSelected, setRiffSelected }) => {
     const queryClient = useQueryClient()
 
     const deleteTodoMutation = useMutation((riff: Riff) => {
         const { id } = riff;
         let stringId = id ? id?.toString() : "";
         return deleteRiff(stringId);
-      }, {
-        onSuccess: () => queryClient.invalidateQueries('riff'),
+      }, { 
+        onSuccess: () =>{ queryClient.invalidateQueries('riff'); clearSelected()},
         onSettled: () => queryClient.refetchQueries(['riff']),
       })
-
-    const showModal = () => {
-
+    
+    const clearSelected = () => {
+      setRiffSelected({}) 
+      showModal(false)
     }
     
     return (
         <Background>
         <Wrapper>
-            <p>Are you sure you want to delete riff:</p>
-            <RiffItem riff={riff} />
-            <Delete type='button' onClick={() => deleteTodoMutation.mutate(riff)}>Delete forever</Delete>
+          <div>
+            <p>Are you sure you want to delete this riff?</p>
+          </div>
+          
+          <div>          
+            <RiffItem riff={riffSelected} key={riffSelected.id} />
+          </div>
+          <ChoiceContainer>
+            <Delete type='button' onClick={() => deleteTodoMutation.mutate(riffSelected)}>Delete forever</Delete>
+            <Cancel onClick={() => clearSelected()}>Cancel</Cancel>
+          </ChoiceContainer>
+
         </Wrapper>
         </Background>
         )
